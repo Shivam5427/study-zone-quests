@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Dojo — Focus Arc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16151c;
+    --paper:#f5efe0;
+    --paper-dim:#ece3cd;
+    --crimson:#e6304a;
+    --azure:#2c5ce6;
+    --sun:#ffc93c;
+    --muted:#6f6a75;
+    --border-w:3px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New','Inter',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{
+    font-family:'Anton','Zen Kaku Gothic New',sans-serif;
+    font-weight:400;
+    letter-spacing:0.01em;
+    line-height:0.95;
+    margin:0;
+  }
+  p{margin:0 0 0.8em 0;}
+  a{color:inherit;}
+  button, input{font-family:inherit;}
+
+  ::selection{background:var(--crimson);color:var(--paper);}
+
+  :focus-visible{
+    outline:3px solid var(--azure);
+    outline-offset:2px;
+  }
+
+  /* ---------- layout shell ---------- */
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- nav ---------- */
+  header.nav{
+    border-bottom:var(--border-w) solid var(--ink);
+    background:var(--paper);
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+  .nav-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 0;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  .brand-mark{
+    width:14px;height:14px;
+    background:var(--crimson);
+    transform:rotate(45deg);
+    flex:none;
+  }
+  .brand-text{
+    font-family:'Anton',sans-serif;
+    font-size:22px;
+    letter-spacing:0.02em;
+  }
+  nav.links{
+    display:flex;
+    gap:28px;
+    font-size:15px;
+    font-weight:700;
+  }
+  nav.links a{
+    text-decoration:none;
+    border-bottom:2px solid transparent;
+    padding-bottom:2px;
+    transition:border-color .15s ease;
+  }
+  nav.links a:hover{border-color:var(--crimson);}
+
+  /* ---------- hero: the one bold move ---------- */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    background:var(--ink);
+    color:var(--paper);
+    clip-path:polygon(0 0, 100% 0, 100% 86%, 0 100%);
+    padding:96px 0 140px;
+  }
+  .hero::before{
+    /* halftone dot field, fading toward the right */
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(var(--paper) 1.6px, transparent 1.6px);
+    background-size:14px 14px;
+    opacity:0.14;
+    mask-image:linear-gradient(120deg, transparent 0%, black 55%);
+    -webkit-mask-image:linear-gradient(120deg, transparent 0%, black 55%);
+  }
+  .hero::after{
+    /* speed lines, upper right */
+    content:"";
+    position:absolute;
+    top:-20%;
+    right:-10%;
+    width:70%;
+    height:140%;
+    background-image:repeating-linear-gradient(115deg, rgba(230,48,74,0.35) 0px, rgba(230,48,74,0.35) 2px, transparent 2px, transparent 26px);
+    opacity:0.5;
+    pointer-events:none;
+  }
+  .hero-inner{
+    position:relative;
+    z-index:2;
+    max-width:660px;
+  }
+  .hero-kicker{
+    display:inline-block;
+    background:var(--crimson);
+    color:var(--paper);
+    font-weight:700;
+    font-size:13px;
+    padding:5px 12px;
+    transform:rotate(-2deg);
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(48px, 8vw, 92px);
+    color:var(--paper);
+  }
+  .hero p.lede{
+    margin-top:22px;
+    font-size:18px;
+    max-width:46ch;
+    color:#d8d4e6;
+  }
+  .hero-cta{
+    margin-top:34px;
+    display:inline-flex;
+    align-items:center;
+    gap:14px;
+  }
+  .btn{
+    position:relative;
+    overflow:hidden;
+    font-weight:700;
+    font-size:15px;
+    padding:14px 26px;
+    border:var(--border-w) solid var(--ink);
+    background:var(--sun);
+    color:var(--ink);
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-block;
+    transition:transform .12s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{background:var(--crimson);color:var(--paper);box-shadow:4px 4px 0 var(--ink);transform:translate(-2px,-2px);}
+  .btn:active{transform:translate(0,0) scale(.94);box-shadow:none;}
+  .btn.ghost{
+    background:transparent;
+    border-color:var(--paper);
+    color:var(--paper);
+  }
+  .btn.ghost:hover{background:var(--paper);color:var(--ink);box-shadow:4px 4px 0 var(--crimson);}
+  .btn.small{padding:9px 16px;font-size:13px;}
+
+  .btn-ripple{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.55);
+    transform:scale(0);
+    pointer-events:none;
+    animation:rippleOut .55s ease-out forwards;
+  }
+  .btn.ghost .btn-ripple{background:rgba(230,48,74,0.35);}
+  @keyframes rippleOut{
+    to{transform:scale(1);opacity:0;}
+  }
+
+  @keyframes popIn{
+    0%{transform:scale(0.4);opacity:0;}
+    60%{transform:scale(1.18);opacity:1;}
+    100%{transform:scale(1);}
+  }
+  @keyframes shakeX{
+    0%,100%{transform:translateX(0) rotate(0deg);}
+    20%{transform:translateX(-4px) rotate(-1deg);}
+    40%{transform:translateX(4px) rotate(1deg);}
+    60%{transform:translateX(-3px) rotate(-0.6deg);}
+    80%{transform:translateX(3px) rotate(0.6deg);}
+  }
+  @keyframes barPulse{
+    0%{filter:brightness(1);}
+    50%{filter:brightness(1.6);}
+    100%{filter:brightness(1);}
+  }
+  @keyframes questClear{
+    0%{transform:scale(1);}
+    35%{transform:scale(1.03);}
+    100%{transform:scale(1);}
+  }
+
+  .hero-anim{
+    opacity:0;
+    transform:translateY(18px);
+    animation:heroIn .7s ease forwards;
+  }
+  .hero-anim.d1{animation-delay:.05s;}
+  .hero-anim.d2{animation-delay:.18s;}
+  .hero-anim.d3{animation-delay:.3s;}
+  @keyframes heroIn{
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ---------- panel primitive (manga panel look) ---------- */
+  .panel{
+    border:var(--border-w) solid var(--ink);
+    background:var(--paper);
+    padding:28px;
+  }
+  .panel-label{
+    font-size:13px;
+    font-weight:700;
+    color:var(--crimson);
+    margin-bottom:8px;
+  }
+
+  /* ---------- main grid: timer + quest log ---------- */
+  section.arc{
+    padding:72px 0;
+  }
+  .grid-two{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+    margin-top:34px;
+  }
+  section.arc h2{
+    font-size:clamp(30px,4vw,44px);
+  }
+  section.arc .section-sub{
+    color:var(--muted);
+    max-width:52ch;
+    margin-top:10px;
+  }
+
+  /* timer */
+  .timer-face{
+    text-align:center;
+    padding:36px 20px 28px;
+  }
+  .timer-mode{
+    display:inline-block;
+    font-weight:700;
+    font-size:13px;
+    padding:4px 12px;
+    background:var(--azure);
+    color:var(--paper);
+    margin-bottom:18px;
+  }
+  .timer-mode.break{background:var(--sun);color:var(--ink);}
+  .timer-clock{
+    font-family:'Anton',sans-serif;
+    font-size:clamp(56px,9vw,84px);
+    letter-spacing:0.02em;
+  }
+  .timer-controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:22px;
+    flex-wrap:wrap;
+  }
+  .timer-settings{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    margin-top:20px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .timer-settings label{display:flex;align-items:center;gap:6px;}
+  .timer-settings input{
+    width:52px;
+    border:2px solid var(--ink);
+    padding:4px 6px;
+    text-align:center;
+    background:var(--paper);
+  }
+
+  /* quest log */
+  .quest-form{
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .quest-form input{
+    flex:1;
+    border:2px solid var(--ink);
+    padding:12px 14px;
+    background:var(--paper);
+    font-size:15px;
+  }
+  ul.quest-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-height:320px;
+    overflow-y:auto;
+  }
+  .quest{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border:2px solid var(--ink);
+    padding:12px 14px;
+    background:var(--paper-dim);
+  }
+  .quest.done{
+    opacity:0.55;
+  }
+  .quest.done .quest-text{text-decoration:line-through;}
+  .quest{transition:transform .18s ease, opacity .18s ease;}
+  .quest.just-cleared{animation:questClear .35s ease;}
+  .quest-check{
+    width:22px;height:22px;
+    border:2px solid var(--ink);
+    background:var(--paper);
+    flex:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:700;
+    transition:transform .12s ease, background-color .15s ease;
+  }
+  .quest-check:hover{transform:scale(1.1);}
+  .quest-check:active{transform:scale(0.85);}
+  .quest.done .quest-check{background:var(--crimson);color:var(--paper);}
+  .quest.done .quest-check span{display:inline-block;animation:popIn .3s ease;}
+  .quest-del{transition:transform .12s ease, color .15s ease;}
+  .quest-del:active{transform:scale(0.8) rotate(90deg);}
+  .quest-text{flex:1;font-size:15px;}
+  .quest-xp{
+    font-size:12px;
+    font-weight:700;
+    color:var(--azure);
+    flex:none;
+  }
+  .quest-del{
+    background:none;
+    border:none;
+    color:var(--muted);
+    cursor:pointer;
+    font-size:18px;
+    line-height:1;
+    padding:2px 6px;
+    flex:none;
+  }
+  .quest-del:hover{color:var(--crimson);}
+  .quest-empty{
+    color:var(--muted);
+    font-size:14px;
+    padding:10px 2px;
+  }
+
+  /* ---------- power meter ---------- */
+  section.meter{
+    background:var(--ink);
+    color:var(--paper);
+    padding:60px 0;
+  }
+  .meter-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:26px;
+    align-items:end;
+    margin-top:30px;
+  }
+  .meter-stat .num{
+    font-family:'Anton',sans-serif;
+    font-size:52px;
+    color:var(--sun);
+  }
+  .meter-stat .lbl{
+    font-size:13px;
+    color:#b9b5c8;
+    margin-top:4px;
+  }
+  .bar-track{
+    width:100%;
+    height:22px;
+    background:#2a2833;
+    border:2px solid var(--paper);
+    margin-top:8px;
+  }
+  .bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--crimson), var(--sun));
+    width:0%;
+    transition:width .4s ease;
+  }
+  .bar-fill.pulse{animation:barPulse .5s ease;}
+
+  .meter-stat .num{transition:transform .15s ease;}
+  .meter-stat .num.bump{animation:popIn .3s ease;}
+
+  /* ---------- sensei says ---------- */
+  section.tip{
+    padding:70px 0 90px;
+  }
+  .tip-box{
+    position:relative;
+    border:var(--border-w) solid var(--ink);
+    background:var(--paper-dim);
+    padding:34px 30px;
+    max-width:640px;
+  }
+  .tip-box:before{
+    content:"";
+    position:absolute;
+    left:40px;
+    bottom:-16px;
+    width:0;height:0;
+    border-left:14px solid transparent;
+    border-right:14px solid transparent;
+    border-top:16px solid var(--ink);
+  }
+  .tip-box:after{
+    content:"";
+    position:absolute;
+    left:44px;
+    bottom:-11px;
+    width:0;height:0;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-top:12px solid var(--paper-dim);
+  }
+  .tip-text{
+    font-size:19px;
+    font-weight:500;
+  }
+  .tip-box.shake{animation:shakeX .4s ease;}
+  .tip-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+  }
+  .tip-source{
+    font-size:13px;
+    color:var(--muted);
+    font-weight:700;
+  }
+
+  footer{
+    border-top:var(--border-w) solid var(--ink);
+    padding:26px 0;
+    font-size:13px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  @media (max-width:800px){
+    .grid-two{grid-template-columns:1fr;}
+    .meter-grid{grid-template-columns:1fr;gap:34px;}
+    nav.links{display:none;}
+    .hero{padding:70px 0 100px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .hero-anim{animation:none;opacity:1;transform:none;}
+    .bar-fill{transition:none;}
+    .btn, .quest-check, .quest-del, .meter-stat .num{transition:none;}
+    .btn:hover{transform:none;}
+    .btn-ripple, .quest.just-cleared, .quest.done .quest-check span,
+    .bar-fill.pulse, .meter-stat .num.bump, .tip-box.shake{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-text">STUDY DOJO</span>
+    </div>
+    <nav class="links">
+      <a href="#timer">Timer</a>
+      <a href="#quests">Quest Log</a>
+      <a href="#meter">Power</a>
+      <a href="#tip">Sensei</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-inner">
+    <span class="hero-kicker hero-anim d1">Focus Arc — Episode 1</span>
+    <h1 class="hero-anim d2">Every study session is a training montage.</h1>
+    <p class="lede hero-anim d3">Run focused sprints, clear quests, and watch your power meter climb. No streak-shaming, no guilt — just the next rep.</p>
+    <div class="hero-cta hero-anim d3">
+      <a href="#timer" class="btn">Start training</a>
+      <a href="#quests" class="btn ghost">View quest log</a>
+    </div>
+  </div>
+</section>
+
+<section class="arc" id="timer">
+  <div class="wrap">
+    <h2>Round one: the sprint</h2>
+    <p class="section-sub">Set your work and rest lengths, then hit start. The clock keeps running even if you're mid-panel daydreaming.</p>
+
+    <div class="grid-two">
+      <div class="panel">
+        <div class="panel-label">FOCUS TIMER</div>
+        <div class="timer-face">
+          <span class="timer-mode" id="timerMode">WORK</span>
+          <div class="timer-clock" id="timerClock">25:00</div>
+          <div class="timer-controls">
+            <button class="btn small" id="btnStart">Start</button>
+            <button class="btn small" id="btnPause">Pause</button>
+            <button class="btn small" id="btnReset">Reset</button>
+          </div>
+          <div class="timer-settings">
+            <label>Work (min) <input type="number" id="workMin" value="25" min="1" max="90"></label>
+            <label>Break (min) <input type="number" id="breakMin" value="5" min="1" max="30"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="quests">
+        <div class="panel-label">QUEST LOG</div>
+        <form class="quest-form" id="questForm">
+          <input type="text" id="questInput" placeholder="Add a quest — e.g. finish chapter 4 problems" maxlength="80">
+          <button class="btn small" type="submit">Add</button>
+        </form>
+        <ul class="quest-list" id="questList"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="meter" id="meter">
+  <div class="wrap">
+    <h2>Power meter</h2>
+    <p class="section-sub" style="color:#b9b5c8;">Finished sprints and cleared quests both feed your XP. Level up is automatic — no cutscene required.</p>
+    <div class="meter-grid">
+      <div class="meter-stat">
+        <div class="num" id="statLevel">1</div>
+        <div class="lbl">Level</div>
+        <div class="bar-track"><div class="bar-fill" id="xpBar"></div></div>
+      </div>
+      <div class="meter-stat">
+        <div class="num" id="statXP">0</div>
+        <div class="lbl">Total XP</div>
+      </div>
+      <div class="meter-stat">
+        <div class="num" id="statSessions">0</div>
+        <div class="lbl">Sprints completed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tip" id="tip">
+  <div class="wrap">
+    <h2 style="margin-bottom:26px;">Sensei says</h2>
+    <div class="tip-box">
+      <p class="tip-text" id="tipText">A messy first draft beats a perfect plan you never started.</p>
+      <div class="tip-row">
+        <span class="tip-source">— DOJO WISDOM</span>
+        <button class="btn small" id="btnNextTip">Next tip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span>Study Dojo — a small tool for getting reps in.</span>
+  <span>Progress resets when you reload the page.</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- Click ripple, on every .btn ---------------- */
+  function spawnRipple(e){
+    if(reduceMotion) return;
+    var btn = e.currentTarget;
+    var rect = btn.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height) * 1.4;
+    var ripple = document.createElement('span');
+    ripple.className = 'btn-ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    var x = (e.clientX || rect.left + rect.width/2) - rect.left - size/2;
+    var y = (e.clientY || rect.top + rect.height/2) - rect.top - size/2;
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', function(){
+      ripple.remove();
+    });
+  }
+  document.querySelectorAll('.btn').forEach(function(btn){
+    btn.addEventListener('click', spawnRipple);
+  });
+
+  /* ---------------- Pomodoro timer ---------------- */
+  var workInput = document.getElementById('workMin');
+  var breakInput = document.getElementById('breakMin');
+  var clockEl = document.getElementById('timerClock');
+  var modeEl = document.getElementById('timerMode');
+  var btnStart = document.getElementById('btnStart');
+  var btnPause = document.getElementById('btnPause');
+  var btnReset = document.getElementById('btnReset');
+
+  var isWork = true;
+  var secondsLeft = parseInt(workInput.value,10) * 60;
+  var timerId = null;
+
+  function formatTime(s){
+    var m = Math.floor(s/60);
+    var sec = s % 60;
+    return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+  }
+
+  function renderClock(){
+    clockEl.textContent = formatTime(secondsLeft);
+    modeEl.textContent = isWork ? 'WORK' : 'BREAK';
+    modeEl.className = 'timer-mode' + (isWork ? '' : ' break');
+  }
+
+  function switchMode(completedWork){
+    isWork = !isWork;
+    var mins = isWork ? parseInt(workInput.value,10) : parseInt(breakInput.value,10);
+    secondsLeft = (mins || (isWork?25:5)) * 60;
+    if(completedWork){
+      addXP(20);
+      state.sessions += 1;
+      renderStats();
+    }
+    renderClock();
+  }
+
+  function tick(){
+    secondsLeft -= 1;
+    if(secondsLeft < 0){
+      switchMode(isWork);
+      return;
+    }
+    renderClock();
+  }
+
+  btnStart.addEventListener('click', function(){
+    if(timerId) return;
+    timerId = setInterval(tick, 1000);
+  });
+  btnPause.addEventListener('click', function(){
+    clearInterval(timerId);
+    timerId = null;
+  });
+  btnReset.addEventListener('click', function(){
+    clearInterval(timerId);
+    timerId = null;
+    isWork = true;
+    secondsLeft = (parseInt(workInput.value,10) || 25) * 60;
+    renderClock();
+  });
+  workInput.addEventListener('change', function(){
+    if(isWork && !timerId){
+      secondsLeft = (parseInt(workInput.value,10) || 25) * 60;
+      renderClock();
+    }
+  });
+  breakInput.addEventListener('change', function(){
+    if(!isWork && !timerId){
+      secondsLeft = (parseInt(breakInput.value,10) || 5) * 60;
+      renderClock();
+    }
+  });
+
+  renderClock();
+
+  /* ---------------- Quest log ---------------- */
+  var questForm = document.getElementById('questForm');
+  var questInput = document.getElementById('questInput');
+  var questList = document.getElementById('questList');
+
+  var state = {
+    quests: [
+      { text: 'Skim tomorrow\'s reading', done: false },
+      { text: 'Redo yesterday\'s missed problems', done: false }
+    ],
+    xp: 0,
+    sessions: 0
+  };
+
+  function renderQuests(){
+    questList.innerHTML = '';
+    if(state.quests.length === 0){
+      var empty = document.createElement('li');
+      empty.className = 'quest-empty';
+      empty.textContent = 'No quests yet — add one above.';
+      questList.appendChild(empty);
+      return;
+    }
+    state.quests.forEach(function(q, idx){
+      var li = document.createElement('li');
+      li.className = 'quest' + (q.done ? ' done' : '');
+
+      var check = document.createElement('button');
+      check.className = 'quest-check';
+      check.type = 'button';
+      check.setAttribute('aria-label', q.done ? 'Mark quest incomplete' : 'Mark quest complete');
+      if(q.done){
+        var mark = document.createElement('span');
+        mark.textContent = '✓';
+        check.appendChild(mark);
+      }
+      check.addEventListener('click', function(){
+        q.done = !q.done;
+        addXP(q.done ? 10 : -10);
+        var wasJustCleared = q.done;
+        renderQuests();
+        renderStats();
+        if(wasJustCleared && !reduceMotion){
+          var row = questList.children[idx];
+          if(row){
+            row.classList.add('just-cleared');
+            row.addEventListener('animationend', function(){ row.classList.remove('just-cleared'); }, {once:true});
+          }
+        }
+      });
+
+      var text = document.createElement('span');
+      text.className = 'quest-text';
+      text.textContent = q.text;
+
+      var xp = document.createElement('span');
+      xp.className = 'quest-xp';
+      xp.textContent = '+10 XP';
+
+      var del = document.createElement('button');
+      del.className = 'quest-del';
+      del.type = 'button';
+      del.setAttribute('aria-label', 'Delete quest');
+      del.textContent = '×';
+      del.addEventListener('click', function(){
+        if(q.done){ addXP(-10); }
+        state.quests.splice(idx,1);
+        renderQuests();
+        renderStats();
+      });
+
+      li.appendChild(check);
+      li.appendChild(text);
+      li.appendChild(xp);
+      li.appendChild(del);
+      questList.appendChild(li);
+    });
+  }
+
+  questForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var val = questInput.value.trim();
+    if(!val) return;
+    state.quests.push({ text: val, done:false });
+    questInput.value = '';
+    renderQuests();
+  });
+
+  renderQuests();
+
+  /* ---------------- Power meter ---------------- */
+  var statLevel = document.getElementById('statLevel');
+  var statXP = document.getElementById('statXP');
+  var statSessions = document.getElementById('statSessions');
+  var xpBar = document.getElementById('xpBar');
+
+  function addXP(amount){
+    state.xp = Math.max(0, state.xp + amount);
+  }
+
+  function bump(el, newText){
+    if(el.textContent === String(newText)) return;
+    el.textContent = newText;
+    if(reduceMotion) return;
+    el.classList.remove('bump');
+    void el.offsetWidth; /* restart animation */
+    el.classList.add('bump');
+  }
+
+  function renderStats(){
+    var level = Math.floor(state.xp / 100) + 1;
+    var progress = state.xp % 100;
+    bump(statLevel, level);
+    bump(statXP, state.xp);
+    bump(statSessions, state.sessions);
+    xpBar.style.width = progress + '%';
+    if(!reduceMotion){
+      xpBar.classList.remove('pulse');
+      void xpBar.offsetWidth;
+      xpBar.classList.add('pulse');
+    }
+  }
+
+  renderStats();
+
+  /* ---------------- Sensei tips ---------------- */
+  var tips = [
+    'A messy first draft beats a perfect plan you never started.',
+    'Twenty-five focused minutes beats three distracted hours.',
+    'Rest is part of training, not a break from it.',
+    'You don\u2019t need motivation. You need the next small rep.',
+    'Review what confused you yesterday before learning something new today.',
+    'Small quests cleared daily beat one giant quest cleared never.',
+    'Progress is quiet. Show up anyway.'
+  ];
+  var tipIdx = 0;
+  var tipText = document.getElementById('tipText');
+  var btnNextTip = document.getElementById('btnNextTip');
+  var tipBox = document.querySelector('.tip-box');
+
+  btnNextTip.addEventListener('click', function(){
+    tipIdx = (tipIdx + 1) % tips.length;
+    tipText.textContent = tips[tipIdx];
+    if(!reduceMotion){
+      tipBox.classList.remove('shake');
+      void tipBox.offsetWidth;
+      tipBox.classList.add('shake');
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
